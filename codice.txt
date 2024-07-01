@@ -1,25 +1,38 @@
 import numpy as np
 
-# Valori di roll, pitch e yaw in radianti
-roll = np.pi / 4  # Esempio: 45 gradi
-pitch = np.pi / 6  # Esempio: 30 gradi
-yaw = np.pi / 3  # Esempio: 60 gradi
+def extract_rotation(start, destination):
+    """
+    Extracts a Vec3 containing the rotation from a vector start to a vector destination.
+    
+    Parameters:
+    - start: A numpy array representing the start vector.
+    - destination: A numpy array representing the destination vector.
+    
+    Returns:
+    - A numpy array representing the rotation vector (Euler angles) required to rotate
+      'start' vector to align with 'destination' vector.
+    """
+    # Normalize the start and destination vectors
+    start_norm = start / np.linalg.norm(start)
+    destination_norm = destination / np.linalg.norm(destination)
+    
+    # Calculate the cross product and angle between the two vectors
+    cross_prod = np.cross(start_norm, destination_norm)
+    dot_prod = np.dot(start_norm, destination_norm)
+    angle = np.arccos(dot_prod)
+    
+    # Normalize the cross product to get the rotation axis
+    rotation_axis = cross_prod / np.linalg.norm(cross_prod)
+    
+    # Convert the rotation axis and angle to Euler angles (assuming here a simple conversion)
+    # Note: This step is highly dependent on the specific use case and might need adjustments
+    # for different conventions or more complex rotations.
+    rotation_euler = rotation_axis * angle
+    
+    return rotation_euler
 
-# Calcola le matrici di rotazione elementari
-R_x = np.array([[1, 0, 0],
-                [0, np.cos(roll), -np.sin(roll)],
-                [0, np.sin(roll), np.cos(roll)]])
-
-R_y = np.array([[np.cos(pitch), 0, np.sin(pitch)],
-                [0, 1, 0],
-                [-np.sin(pitch), 0, np.cos(pitch)]])
-
-R_z = np.array([[np.cos(yaw), -np.sin(yaw), 0],
-                [np.sin(yaw), np.cos(yaw), 0],
-                [0, 0, 1]])
-
-# Combinazione delle rotazioni
-R = np.dot(R_z, np.dot(R_y, R_x))
-
-print("Matrice di rotazione R:")
-print(R)
+# Example usage
+start_vec = np.array([1, 0, 0])
+destination_vec = np.array([0, 1, 0])
+rotation = extract_rotation(start_vec, destination_vec)
+print("Rotation (Euler angles):", rotation)
